@@ -125,20 +125,15 @@ LinkIO.setDeepLinkListener { deepLink ->
     println("Params: ${deepLink.params}")
     println("Deferred: ${deepLink.isDeferred}")
 
-    // Handle different link types
-    when (deepLink.params["type"]) {
-        "referral" -> {
-            val code = deepLink.params["code"]
-            // Handle referral
-        }
-        "profile" -> {
-            val userId = deepLink.params["userId"]
-            // Show user profile
-        }
-        "product" -> {
-            val productId = deepLink.params["productId"]
-            // Show product
-        }
+    // Handle params directly - no "type" field needed
+    deepLink.params["referralCode"]?.let { code ->
+        // Handle referral
+    }
+    deepLink.params["userId"]?.let { userId ->
+        // Show user profile
+    }
+    deepLink.params["carId"]?.let { carId ->
+        // Show car details (Ejaro)
     }
 }
 ```
@@ -148,9 +143,9 @@ LinkIO.setDeepLinkListener { deepLink ->
 Use a generic `/link` endpoint with query params:
 
 ```
-https://yourdomain.com/link?type=referral&code=ABC123
-https://yourdomain.com/link?type=profile&userId=456
-https://yourdomain.com/link?type=product&productId=789
+https://rokart.in/link?referralCode=ABC123
+https://speekfeed.in/link?userId=456
+https://ejaro.com/link?carId=789
 ```
 
 ### Track Referrals
