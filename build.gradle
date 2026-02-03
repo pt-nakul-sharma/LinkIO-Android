@@ -1,0 +1,100 @@
+plugins {
+    id 'com.android.library' version '8.3.0'
+    id 'org.jetbrains.kotlin.android' version '1.9.22'
+    id 'maven-publish'
+}
+
+android {
+    // Library will use consuming app's compileSdk if higher
+    compileSdk 35
+
+    defaultConfig {
+        // Minimum SDK requirement - apps must meet this
+        minSdk 24
+        // No targetSdk - inherits from consuming app
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        consumerProguardFiles "consumer-rules.pro"
+
+        // 16KB page size support for Android 15+
+        ndk {
+            abiFilters 'armeabi-v7a', 'arm64-v8a', 'x86', 'x86_64'
+        }
+    }
+
+    // Enable 16KB page size compatibility
+    buildFeatures {
+        buildConfig = true
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    kotlinOptions {
+        jvmTarget = '17'
+    }
+
+    namespace 'io.linkio.android'
+}
+
+dependencies {
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:1.9.22"
+    implementation "androidx.core:core-ktx:1.12.0"
+    implementation "androidx.appcompat:appcompat:1.6.1"
+    implementation "androidx.lifecycle:lifecycle-process:2.7.0"
+    implementation "com.squareup.okhttp3:okhttp:4.12.0"
+    implementation "com.google.code.gson:gson:2.10.1"
+
+    testImplementation "junit:junit:4.13.2"
+    androidTestImplementation "androidx.test.ext:junit:1.1.5"
+    androidTestImplementation "androidx.test.espresso:espresso-core:3.5.1"
+}
+
+afterEvaluate {
+    publishing {
+        publications {
+            release(MavenPublication) {
+                from components.release
+                groupId = 'io.linkio'
+                artifactId = 'linkio-android'
+                version = '1.0.0'
+
+                pom {
+                    name = 'LinkIO Android'
+                    description = 'Self-hosted deep linking SDK for Android'
+                    url = 'https://github.com/pt-nakul-sharma/LinkIO-Android'
+
+                    licenses {
+                        license {
+                            name = 'MIT License'
+                            url = 'https://opensource.org/licenses/MIT'
+                        }
+                    }
+
+                    developers {
+                        developer {
+                            id = 'pt-nakul-sharma'
+                            name = 'Nakul Sharma'
+                            email = 'nakul@rokart.in'
+                        }
+                    }
+
+                    scm {
+                        connection = 'scm:git:git://github.com/pt-nakul-sharma/LinkIO-Android.git'
+                        developerConnection = 'scm:git:ssh://github.com:pt-nakul-sharma/LinkIO-Android.git'
+                        url = 'https://github.com/pt-nakul-sharma/LinkIO-Android'
+                    }
+                }
+            }
+        }
+    }
+}
