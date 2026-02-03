@@ -37,15 +37,20 @@ import io.linkio.android.LinkIO
 import io.linkio.android.LinkIOConfig
 
 class MyApplication : Application() {
+
+    // Configure your backend URL with API version
+    private val apiVersion = "api/v1/"  // Match your backend route structure
+    private val baseURL = "https://api.yourdomain.com/"
+
     override fun onCreate() {
         super.onCreate()
 
         val config = LinkIOConfig(
             domain = "yourdomain.com",
-            backendURL = "https://yourdomain.com"
+            backendURL = baseURL + apiVersion  // Full path: https://api.yourdomain.com/api/v1/
         )
 
-        LinkIO.init(this, config)
+        LinkIO.configure(this, config)
 
         LinkIO.setDeepLinkListener { deepLink ->
             Log.d("LinkIO", "Received: ${deepLink.params}")
@@ -98,12 +103,18 @@ class MainActivity : AppCompatActivity() {
 ### Configuration
 
 ```kotlin
+// backendURL should include the full API path
+// SDK appends: pending-link/, track-referral
 val config = LinkIOConfig(
     domain = "yourdomain.com",
-    backendURL = "https://yourdomain.com",
+    backendURL = "https://api.yourdomain.com/api/v1/",  // Trailing slash required
     autoCheckPendingLinks = true
 )
-LinkIO.init(context, config)
+LinkIO.configure(application, config)
+
+// SDK will call:
+// - https://api.yourdomain.com/api/v1/pending-link/:deviceId
+// - https://api.yourdomain.com/api/v1/track-referral
 ```
 
 ### Set Deep Link Listener
