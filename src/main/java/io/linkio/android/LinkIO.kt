@@ -53,13 +53,22 @@ class LinkIO private constructor(private val config: LinkIOConfig) {
         })
     }
 
+    /**
+     * Handle App Links (https://domain.com/...) and custom URL schemes (appscheme://...)
+     */
     fun handleDeepLink(intent: Intent?): Boolean {
         intent ?: return false
 
         val uri = intent.data ?: return false
-        val host = uri.host ?: return false
 
-        if (host != config.domain && host != "www.${config.domain}") {
+        // Check if it's a domain URL (App Link)
+        val host = uri.host
+        val isDomainURL = host == config.domain || host == "www.${config.domain}"
+
+        // Check if it's an app scheme URL
+        val isAppSchemeURL = config.appScheme != null && uri.scheme == config.appScheme
+
+        if (!isDomainURL && !isAppSchemeURL) {
             return false
         }
 
@@ -81,6 +90,14 @@ class LinkIO private constructor(private val config: LinkIOConfig) {
         }
 
         return true
+    }
+
+    /**
+     * Convenience method for handling app scheme URLs
+     */
+    fun handleAppSchemeURL(uri: Uri): Boolean {
+        val intent = Intent().apply { data = uri }
+        return handleDeepLink(intent)
     }
 
     fun setDeepLinkHandler(handler: (DeepLinkData) -> Unit) {
