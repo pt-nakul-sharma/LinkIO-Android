@@ -93,6 +93,43 @@ class LinkIO private constructor(private val config: LinkIOConfig) {
     }
 
     fun checkPendingLink(context: Context) {
+        // Use fingerprint-based endpoint (IP matching) for deferred deep linking
+        // This works even when User-Agent differs between browser and app
+        val url = "${config.backendURL}pending-link"
+
+        val request = Request.Builder()
+            .url(url)
+            .get()
+            .build()
+
+        client.newCall(request).enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {
+                // Fallback to deviceId-based endpoint
+                checkPendingLinkByDeviceId(context)
+            }
+
+            override fun onResponse(call: Call, response: Response) {
+                if (response.isSuccessful) {
+                    response.body?.string()?.let { json ->
+                        try {
+                            val deepLink = gson.fromJson(json, DeepLinkData::class.java)
+                            deepLinkHandler?.invoke(deepLink) ?: run {
+                                pendingDeepLink = deepLink
+                            }
+                        } catch (e: Exception) {
+                            // Fallback to deviceId-based endpoint
+                            checkPendingLinkByDeviceId(context)
+                        }
+                    }
+                } else {
+                    // Fallback to deviceId-based endpoint
+                    checkPendingLinkByDeviceId(context)
+                }
+            }
+        })
+    }
+
+    private fun checkPendingLinkByDeviceId(context: Context) {
         val deviceId = getDeviceId(context)
         val url = "${config.backendURL}pending-link/$deviceId"
 
