@@ -24,7 +24,7 @@ Add dependency to your module `build.gradle`:
 
 ```gradle
 dependencies {
-    implementation 'com.github.pt-nakul-sharma:LinkIO-Android:1.0.0'
+    implementation 'com.github.pt-nakul-sharma:LinkIO-Android:1.1.0'
 }
 ```
 
@@ -47,7 +47,8 @@ class MyApplication : Application() {
 
         val config = LinkIOConfig(
             domain = "yourdomain.com",
-            backendURL = baseURL + apiVersion  // Full path: https://api.yourdomain.com/api/v1/
+            backendURL = baseURL + apiVersion,  // Full path: https://api.yourdomain.com/api/v1/
+            appScheme = "yourapp"  // Custom URL scheme (e.g., yourapp://)
         )
 
         LinkIO.configure(this, config)
@@ -108,6 +109,7 @@ class MainActivity : AppCompatActivity() {
 val config = LinkIOConfig(
     domain = "yourdomain.com",
     backendURL = "https://api.yourdomain.com/api/v1/",  // Trailing slash required
+    appScheme = "yourapp",  // Custom URL scheme (e.g., yourapp://)
     autoCheckPendingLinks = true
 )
 LinkIO.configure(application, config)
